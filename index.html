@@ -12,7 +12,6 @@
             --card-bg: #181818;
             --text-main: #ffffff;
             --text-dim: #b3b3b3;
-            --accent-blue: #2E5BFF;
         }
 
         body {
@@ -25,7 +24,7 @@
             overflow: hidden;
         }
 
-        /* PANEL IZQUIERDO: VIDEO Y AHORA SUENA */
+        /* PANEL IZQUIERDO: VIDEO Y REPRODUCCIÓN */
         .player-section {
             flex: 2;
             display: flex;
@@ -42,7 +41,7 @@
 
         .playback-info {
             padding: 30px;
-            background: linear-gradient(180deg, rgba(29,185,84,0.15) 0%, rgba(0,0,0,1) 100%);
+            background: linear-gradient(180deg, rgba(29,185,84,0.1) 0%, rgba(0,0,0,1) 100%);
             display: flex;
             align-items: center;
             flex-grow: 1;
@@ -61,14 +60,14 @@
             font-size: 11px;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 2.5px;
+            letter-spacing: 2px;
             color: var(--spotify-green);
             margin-bottom: 8px;
             display: block;
         }
 
         #current-user-display {
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 900;
             margin: 0;
             letter-spacing: -1px;
@@ -83,14 +82,11 @@
             font-weight: 800;
             cursor: pointer;
             transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .skip-control:hover {
-            background: var(--spotify-green);
             transform: scale(1.05);
+            background: var(--spotify-green);
         }
 
         /* PANEL DERECHO: COLA E HISTORIAL */
@@ -120,7 +116,7 @@
         .scroll-area::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
 
         .section-label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
             color: var(--spotify-green);
             text-transform: uppercase;
@@ -128,8 +124,6 @@
             margin: 25px 0 15px 0;
             display: block;
         }
-
-        .section-label:first-child { margin-top: 0; }
 
         /* ESTILO DE LAS TARJETAS */
         .track-card {
@@ -139,14 +133,10 @@
             padding: 12px;
             border-radius: 12px;
             margin-bottom: 10px;
-            transition: 0.3s;
             border: 1px solid transparent;
         }
 
-        .track-card.waiting { border-left: 4px solid var(--spotify-green); }
-        .track-card.played { opacity: 0.4; filter: grayscale(0.8); border-left: 4px solid #444; }
-
-        .track-card:hover { background: #222; }
+        .track-card.played { opacity: 0.4; filter: grayscale(1); }
 
         .track-card img {
             width: 70px;
@@ -156,26 +146,26 @@
             object-fit: cover;
         }
 
-        .track-info { flex: 1; }
-        .track-info b { display: block; font-size: 14px; margin-bottom: 2px; }
+        .track-info { flex: 1; overflow: hidden; }
+        .track-info b { display: block; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .track-info span { font-size: 11px; color: var(--text-dim); }
 
-        .btn-action {
+        .btn-play-manual {
             background: var(--spotify-green);
             color: black;
             border: none;
-            padding: 8px 15px;
+            padding: 8px 12px;
             border-radius: 20px;
             font-weight: 800;
             font-size: 11px;
             cursor: pointer;
         }
 
-        .btn-delete-all {
+        .btn-reset {
             background: #ff4444;
             color: white;
             border: none;
-            padding: 8px 12px;
+            padding: 6px 12px;
             border-radius: 6px;
             font-size: 10px;
             font-weight: bold;
@@ -188,28 +178,26 @@
     <div class="player-section">
         <div id="yt-player"></div>
         <div class="playback-info">
-            <img src="logo-osr.png" alt="Logo" class="logo-osr">
+            <img src="logo-osr.png" class="logo-osr">
             <div class="current-track-details">
-                <span class="label-status">● Reproduciendo ahora</span>
-                <h1 id="current-user-display">SISTEMA LISTO</h1>
+                <span class="label-status">● Reproduciendo</span>
+                <h1 id="current-user-display">LISTA VACÍA</h1>
             </div>
-            <button class="skip-control" onclick="autoSkip()">
-                SIGUIENTE ⏭️
-            </button>
+            <button class="skip-control" onclick="autoSkip()">SALTAR ⏭️</button>
         </div>
     </div>
 
     <div class="sidebar-section">
         <div class="sidebar-header">
-            <h2 style="font-size: 14px; margin:0; letter-spacing: 1px;">THE HUB CONTROL</h2>
-            <button class="btn-delete-all" onclick="clearAllData()">LIMPIAR SESIÓN</button>
+            <h2 style="font-size: 14px; margin:0;">CONTROL HUB OSR</h2>
+            <button class="btn-reset" onclick="resetList()">LIMPIAR TODO</button>
         </div>
         
         <div class="scroll-area">
-            <span class="section-label">Próximos en fila</span>
+            <span class="section-label">Próximos</span>
             <div id="queue-container"></div>
 
-            <span class="section-label">Historial de la sesión</span>
+            <span class="section-label">Historial</span>
             <div id="history-container"></div>
         </div>
     </div>
@@ -219,10 +207,8 @@
     <script src="https://www.youtube.com/iframe_api"></script>
 
     <script>
-        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCk4wgJ2LPicyWnO8XXPQxqu49dtqM8jz4",
-            authDomain: "the-hub-music-osr.firebaseapp.com",
             databaseURL: "https://the-hub-music-osr-default-rtdb.firebaseio.com",
             projectId: "the-hub-music-osr",
             appId: "1:225954155604:web:cb84739b7d7e769661b1c1"
@@ -231,14 +217,13 @@
         const db = firebase.database();
 
         let player;
+        let isFirstLoad = true;
 
-        // Inicializar YouTube Player
+        // 1. Iniciar YouTube
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('yt-player', {
-                height: '100%',
-                width: '100%',
-                videoId: '',
-                playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0 },
+                height: '100%', width: '100%', videoId: '',
+                playerVars: { 'autoplay': 1, 'controls': 1 },
                 events: {
                     'onStateChange': (event) => {
                         if (event.data === YT.PlayerState.ENDED) autoSkip();
@@ -247,7 +232,7 @@
             });
         }
 
-        // Sincronización en tiempo real con Firebase
+        // 2. Escuchar Firebase en tiempo real
         db.ref('osr_lista').on('value', (snapshot) => {
             const queueList = document.getElementById('queue-container');
             const historyList = document.getElementById('history-container');
@@ -255,10 +240,7 @@
             queueList.innerHTML = "";
             historyList.innerHTML = "";
 
-            if (!snapshot.exists()) {
-                queueList.innerHTML = "<p style='color:#444; font-size:12px;'>No hay pedidos pendientes...</p>";
-                return;
-            }
+            if (!snapshot.exists()) return;
 
             snapshot.forEach((child) => {
                 const data = child.val();
@@ -266,65 +248,67 @@
                 const card = document.createElement('div');
 
                 if (data.estado === 'reproducida') {
-                    // Cargar en Historial
                     card.className = 'track-card played';
                     card.innerHTML = `
                         <img src="https://img.youtube.com/vi/${data.id}/mqdefault.jpg">
                         <div class="track-info">
                             <b>${data.user}</b>
-                            <span>Sonó a las ${data.time_played || 'desconocida'}</span>
+                            <span>Finalizada</span>
                         </div>
                     `;
-                    historyList.prepend(card); // Lo último que sonó aparece primero en historial
+                    historyList.prepend(card);
                 } else {
-                    // Cargar en Cola de Espera
-                    card.className = 'track-card waiting';
+                    card.className = 'track-card';
                     card.innerHTML = `
                         <img src="https://img.youtube.com/vi/${data.id}/mqdefault.jpg">
                         <div class="track-info">
                             <b>${data.user}</b>
-                            <span>Pedido a las ${data.time || ''}</span>
+                            <span>Pedido: ${data.time}</span>
                         </div>
-                        <button class="btn-action" onclick="playNow('${data.id}', '${data.user}', '${key}')">PLAY</button>
+                        <button class="btn-play-manual" onclick="playSong('${data.id}', '${data.user}', '${key}')">PLAY</button>
                     `;
                     queueList.appendChild(card);
                 }
             });
+
+            // Auto-reproducir la primera si no hay nada sonando al abrir la app
+            if (isFirstLoad) {
+                isFirstLoad = false;
+                setTimeout(autoSkip, 2000);
+            }
         });
 
-        // Función para reproducir y marcar en Firebase
-        function playNow(id, user, key) {
-            if (player) {
-                player.loadVideoById(id);
-                document.getElementById('current-user-display').innerText = `ORDEN DE: ${user.toUpperCase()}`;
-                
-                // Actualizar estado en Firebase para moverlo al historial
-                db.ref('osr_lista/' + key).update({
-                    estado: 'reproducida',
-                    time_played: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                });
-            }
+        // 3. Función para reproducir
+        function playSong(id, user, key) {
+            player.loadVideoById(id);
+            document.getElementById('current-user-display').innerText = `ORDEN DE: ${user.toUpperCase()}`;
+            
+            // Marcar como reproducida en Firebase
+            db.ref('osr_lista/' + key).update({
+                estado: 'reproducida',
+                timestamp_end: Date.now()
+            });
         }
 
-        // Función de salto automático
+        // 4. Saltar a la siguiente canción automática
         function autoSkip() {
-            // Busca la primera canción que NO tenga el estado 'reproducida'
             db.ref('osr_lista').orderByChild('estado').equalTo(null).limitToFirst(1).once('value', (snap) => {
                 if (snap.exists()) {
                     snap.forEach(child => {
                         const song = child.val();
-                        playNow(song.id, song.user, child.key);
+                        playSong(song.id, song.user, child.key);
                     });
                 } else {
-                    document.getElementById('current-user-display').innerText = "FIN DE LA LISTA";
+                    document.getElementById('current-user-display').innerText = "ESPERANDO PEDIDOS...";
                 }
             });
         }
 
-        // Borrar toda la base de datos
-        function clearAllData() {
-            if (confirm("¿Deseas resetear toda la cola y el historial?")) {
+        // 5. Resetear sistema
+        function resetList() {
+            if (confirm("¿Borrar toda la lista e historial?")) {
                 db.ref('osr_lista').remove();
+                location.reload();
             }
         }
     </script>
