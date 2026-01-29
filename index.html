@@ -2,20 +2,22 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>OSR Admin Control - Monitor de Audio</title>
+    <title>OSR Admin Control - Monitor Profesional</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --spotify-green: #1DB954;
-            --dark-bg: #000000;
-            --panel-bg: #121212;
-            --card-hover: #282828;
-            --border: rgba(255,255,255,0.1);
+            --bg-black: #000000;
+            --panel-dark: #121212;
+            --card-bg: #181818;
+            --text-main: #ffffff;
+            --text-dim: #b3b3b3;
+            --accent-blue: #2E5BFF;
         }
 
         body {
-            background: var(--dark-bg);
-            color: white;
+            background: var(--bg-black);
+            color: var(--text-main);
             font-family: 'Inter', sans-serif;
             margin: 0;
             display: flex;
@@ -23,158 +25,193 @@
             overflow: hidden;
         }
 
-        /* LADO IZQUIERDO: REPRODUCTOR */
-        .player-container {
+        /* PANEL IZQUIERDO: VIDEO Y AHORA SUENA */
+        .player-section {
             flex: 2;
             display: flex;
             flex-direction: column;
             background: #000;
-            border-right: 1px solid var(--border);
+            border-right: 1px solid rgba(255,255,255,0.1);
         }
 
         #yt-player {
             width: 100%;
-            height: 75%;
+            height: 70%;
             background: #050505;
         }
 
-        .now-playing {
+        .playback-info {
             padding: 30px;
             background: linear-gradient(180deg, rgba(29,185,84,0.15) 0%, rgba(0,0,0,1) 100%);
             display: flex;
             align-items: center;
+            flex-grow: 1;
         }
 
         .logo-osr {
-            width: 70px;
+            width: 80px;
             height: auto;
-            margin-right: 25px;
-            filter: drop-shadow(0 0 10px var(--spotify-green));
+            margin-right: 30px;
+            filter: drop-shadow(0 0 15px var(--spotify-green));
         }
 
-        .current-info {
-            flex: 1;
-        }
+        .current-track-details { flex-grow: 1; }
 
-        .status-tag {
+        .label-status {
             font-size: 11px;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 2.5px;
             color: var(--spotify-green);
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             display: block;
         }
 
-        #current-user {
-            font-size: 32px;
+        #current-user-display {
+            font-size: 36px;
             font-weight: 900;
             margin: 0;
-            color: #fff;
+            letter-spacing: -1px;
         }
 
-        .btn-skip {
+        .skip-control {
             background: white;
             color: black;
             border: none;
-            padding: 12px 20px;
+            padding: 15px 25px;
             border-radius: 50px;
             font-weight: 800;
             cursor: pointer;
-            margin-left: 20px;
-            transition: 0.2s;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .btn-skip:hover { transform: scale(1.05); background: var(--spotify-green); }
+        .skip-control:hover {
+            background: var(--spotify-green);
+            transform: scale(1.05);
+        }
 
-        /* LADO DERECHO: LISTA DE ESPERA */
-        .sidebar {
+        /* PANEL DERECHO: COLA E HISTORIAL */
+        .sidebar-section {
             flex: 1;
-            background: var(--panel-bg);
+            background: var(--panel-dark);
             display: flex;
             flex-direction: column;
-            min-width: 380px;
+            min-width: 400px;
         }
 
         .sidebar-header {
             padding: 25px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .btn-clear {
+        .scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .scroll-area::-webkit-scrollbar { width: 6px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--spotify-green);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin: 25px 0 15px 0;
+            display: block;
+        }
+
+        .section-label:first-child { margin-top: 0; }
+
+        /* ESTILO DE LAS TARJETAS */
+        .track-card {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            transition: 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .track-card.waiting { border-left: 4px solid var(--spotify-green); }
+        .track-card.played { opacity: 0.4; filter: grayscale(0.8); border-left: 4px solid #444; }
+
+        .track-card:hover { background: #222; }
+
+        .track-card img {
+            width: 70px;
+            height: 45px;
+            border-radius: 6px;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+
+        .track-info { flex: 1; }
+        .track-info b { display: block; font-size: 14px; margin-bottom: 2px; }
+        .track-info span { font-size: 11px; color: var(--text-dim); }
+
+        .btn-action {
+            background: var(--spotify-green);
+            color: black;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .btn-delete-all {
             background: #ff4444;
             color: white;
             border: none;
             padding: 8px 12px;
             border-radius: 6px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
-            cursor: pointer;
-        }
-
-        #order-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-        }
-
-        .track-card {
-            display: flex;
-            align-items: center;
-            background: #181818;
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            border: 1px solid transparent;
-        }
-
-        .track-card img {
-            width: 80px;
-            height: 55px;
-            border-radius: 8px;
-            object-fit: cover;
-            margin-right: 15px;
-        }
-
-        .track-meta { flex: 1; }
-        .track-meta b { display: block; font-size: 14px; color: #fff; }
-        .track-meta span { font-size: 11px; color: #888; }
-
-        .btn-play-now {
-            background: var(--spotify-green);
-            color: black;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 20px;
-            font-weight: 800;
-            font-size: 12px;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <div class="player-container">
+    <div class="player-section">
         <div id="yt-player"></div>
-        <div class="now-playing">
+        <div class="playback-info">
             <img src="logo-osr.png" alt="Logo" class="logo-osr">
-            <div class="current-info">
-                <span class="status-tag">En vivo - Reproductor OSR</span>
-                <h1 id="current-user">ESPERANDO PEDIDOS...</h1>
+            <div class="current-track-details">
+                <span class="label-status">● Reproduciendo ahora</span>
+                <h1 id="current-user-display">SISTEMA LISTO</h1>
             </div>
-            <button class="btn-skip" onclick="skipSong()">SALTAR ⏭️</button>
+            <button class="skip-control" onclick="autoSkip()">
+                SIGUIENTE ⏭️
+            </button>
         </div>
     </div>
 
-    <div class="sidebar">
+    <div class="sidebar-section">
         <div class="sidebar-header">
-            <h2 style="font-size: 14px; margin:0; letter-spacing: 1px;">COLA DE PRODUCCIÓN</h2>
-            <button class="btn-clear" onclick="clearDatabase()">LIMPIAR COLA</button>
+            <h2 style="font-size: 14px; margin:0; letter-spacing: 1px;">THE HUB CONTROL</h2>
+            <button class="btn-delete-all" onclick="clearAllData()">LIMPIAR SESIÓN</button>
         </div>
-        <div id="order-list"></div>
+        
+        <div class="scroll-area">
+            <span class="section-label">Próximos en fila</span>
+            <div id="queue-container"></div>
+
+            <span class="section-label">Historial de la sesión</span>
+            <div id="history-container"></div>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -182,6 +219,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
 
     <script>
+        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCk4wgJ2LPicyWnO8XXPQxqu49dtqM8jz4",
             authDomain: "the-hub-music-osr.firebaseapp.com",
@@ -193,81 +231,101 @@
         const db = firebase.database();
 
         let player;
-        let currentKey = null;
 
+        // Inicializar YouTube Player
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('yt-player', {
                 height: '100%',
                 width: '100%',
                 videoId: '',
                 playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0 },
-                events: { 'onStateChange': onPlayerStateChange }
-            });
-        }
-
-        // Detectar cuando la canción termina
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.ENDED) {
-                skipSong(); // Al terminar, busca la siguiente
-            }
-        }
-
-        // Cargar lista en tiempo real
-        db.ref('osr_lista').on('value', (snapshot) => {
-            const listContainer = document.getElementById('order-list');
-            listContainer.innerHTML = "";
-            
-            if (!snapshot.exists()) {
-                listContainer.innerHTML = "<p style='color:#555; text-align:center;'>Cola vacía.</p>";
-                return;
-            }
-
-            snapshot.forEach((child) => {
-                const song = child.val();
-                const key = child.key;
-                const card = document.createElement('div');
-                card.className = 'track-card';
-                card.innerHTML = `
-                    <img src="https://img.youtube.com/vi/${song.id}/mqdefault.jpg">
-                    <div class="track-meta">
-                        <b>${song.user}</b>
-                        <span>${song.timestamp}</span>
-                    </div>
-                    <button class="btn-play-now" onclick="manualPlay('${song.id}', '${song.user}', '${key}')">PLAY</button>
-                `;
-                listContainer.appendChild(card);
-            });
-        });
-
-        function manualPlay(id, user, key) {
-            playSong(id, user, key);
-        }
-
-        function playSong(id, user, key) {
-            if(player && player.loadVideoById) {
-                player.loadVideoById(id);
-                document.getElementById('current-user').innerText = `ORDEN DE: ${user.toUpperCase()}`;
-                currentKey = key;
-                // Borramos de la lista porque ya se está reproduciendo
-                db.ref('osr_lista/' + key).remove();
-            }
-        }
-
-        function skipSong() {
-            db.ref('osr_lista').limitToFirst(1).once('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    snapshot.forEach((child) => {
-                        const song = child.val();
-                        playSong(song.id, song.user, child.key);
-                    });
-                } else {
-                    document.getElementById('current-user').innerText = "ESPERANDO PEDIDOS...";
+                events: {
+                    'onStateChange': (event) => {
+                        if (event.data === YT.PlayerState.ENDED) autoSkip();
+                    }
                 }
             });
         }
 
-        function clearDatabase() {
-            if(confirm("¿Limpiar toda la cola?")) db.ref('osr_lista').remove();
+        // Sincronización en tiempo real con Firebase
+        db.ref('osr_lista').on('value', (snapshot) => {
+            const queueList = document.getElementById('queue-container');
+            const historyList = document.getElementById('history-container');
+            
+            queueList.innerHTML = "";
+            historyList.innerHTML = "";
+
+            if (!snapshot.exists()) {
+                queueList.innerHTML = "<p style='color:#444; font-size:12px;'>No hay pedidos pendientes...</p>";
+                return;
+            }
+
+            snapshot.forEach((child) => {
+                const data = child.val();
+                const key = child.key;
+                const card = document.createElement('div');
+
+                if (data.estado === 'reproducida') {
+                    // Cargar en Historial
+                    card.className = 'track-card played';
+                    card.innerHTML = `
+                        <img src="https://img.youtube.com/vi/${data.id}/mqdefault.jpg">
+                        <div class="track-info">
+                            <b>${data.user}</b>
+                            <span>Sonó a las ${data.time_played || 'desconocida'}</span>
+                        </div>
+                    `;
+                    historyList.prepend(card); // Lo último que sonó aparece primero en historial
+                } else {
+                    // Cargar en Cola de Espera
+                    card.className = 'track-card waiting';
+                    card.innerHTML = `
+                        <img src="https://img.youtube.com/vi/${data.id}/mqdefault.jpg">
+                        <div class="track-info">
+                            <b>${data.user}</b>
+                            <span>Pedido a las ${data.time || ''}</span>
+                        </div>
+                        <button class="btn-action" onclick="playNow('${data.id}', '${data.user}', '${key}')">PLAY</button>
+                    `;
+                    queueList.appendChild(card);
+                }
+            });
+        });
+
+        // Función para reproducir y marcar en Firebase
+        function playNow(id, user, key) {
+            if (player) {
+                player.loadVideoById(id);
+                document.getElementById('current-user-display').innerText = `ORDEN DE: ${user.toUpperCase()}`;
+                
+                // Actualizar estado en Firebase para moverlo al historial
+                db.ref('osr_lista/' + key).update({
+                    estado: 'reproducida',
+                    time_played: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                });
+            }
+        }
+
+        // Función de salto automático
+        function autoSkip() {
+            // Busca la primera canción que NO tenga el estado 'reproducida'
+            db.ref('osr_lista').orderByChild('estado').equalTo(null).limitToFirst(1).once('value', (snap) => {
+                if (snap.exists()) {
+                    snap.forEach(child => {
+                        const song = child.val();
+                        playNow(song.id, song.user, child.key);
+                    });
+                } else {
+                    document.getElementById('current-user-display').innerText = "FIN DE LA LISTA";
+                }
+            });
+        }
+
+        // Borrar toda la base de datos
+        function clearAllData() {
+            if (confirm("¿Deseas resetear toda la cola y el historial?")) {
+                db.ref('osr_lista').remove();
+            }
         }
     </script>
 </body>
