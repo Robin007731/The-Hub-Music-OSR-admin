@@ -5,88 +5,27 @@
     <title>OSR Admin - Control Maestro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #1DB954;
-            --bg: #000000;
-            --panel: #121212;
-            --card: #181818;
-            --text: #ffffff;
-            --text-dim: #b3b3b3;
-        }
-
-        body { 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; 
-            display: flex; 
-            height: 100vh; 
-            overflow: hidden; 
-        }
-
-        /* LADO IZQUIERDO: REPRODUCTOR */
-        .player-area { 
-            flex: 2; 
-            display: flex; 
-            flex-direction: column; 
-            border-right: 1px solid #222; 
-        }
-
-        #yt-player { width: 100%; flex-grow: 1; background: #000; }
-
-        .now-playing { 
-            padding: 25px; 
-            background: linear-gradient(to top, #000, #121212); 
-            display: flex; 
-            align-items: center; 
-            border-top: 2px solid var(--primary);
-        }
-
-        .info-box { flex: 1; margin-left: 20px; }
-        .status-badge { 
-            font-size: 10px; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            color: var(--primary); 
-            border: 1px solid var(--primary); 
-            padding: 3px 8px; 
-            border-radius: 4px; 
-        }
-
-        /* LADO DERECHO: FILA EN TIEMPO REAL */
-        .sidebar { flex: 1; background: var(--panel); display: flex; flex-direction: column; min-width: 350px; }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid #222; font-weight: 900; color: var(--primary); display: flex; justify-content: space-between; }
+        :root { --primary: #1DB954; --bg: #000000; --panel: #121212; --card: #181818; --text: #ffffff; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
+        /* REPRODUCTOR */
+        .player-area { flex: 2; display: flex; flex-direction: column; border-right: 1px solid #222; }
+        #yt-player { width: 100%; flex-grow: 1; background: #000; }
+        .now-playing { padding: 25px; background: #121212; display: flex; align-items: center; border-top: 2px solid var(--primary); }
+        .info-box { flex: 1; margin-left: 20px; }
+        
+        /* SIDEBAR SINCRONIZADA */
+        .sidebar { flex: 1; background: var(--panel); display: flex; flex-direction: column; min-width: 350px; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid #222; font-weight: 900; color: var(--primary); }
         .list-scroll { flex: 1; overflow-y: auto; padding: 15px; }
-        .section-title { font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin: 15px 0; display: block; letter-spacing: 1px; }
+        .section-title { font-size: 11px; color: #555; text-transform: uppercase; margin: 15px 0; display: block; }
 
-        .track-card { 
-            display: flex; 
-            align-items: center; 
-            background: var(--card); 
-            padding: 10px; 
-            border-radius: 12px; 
-            margin-bottom: 10px; 
-            transition: 0.3s;
-            border: 1px solid transparent;
-        }
-        .track-card:hover { border-color: #333; }
+        .track-card { display: flex; align-items: center; background: var(--card); padding: 10px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #222; }
         .track-card img { width: 50px; height: 50px; border-radius: 8px; margin-right: 15px; object-fit: cover; }
-        .track-text { flex: 1; overflow: hidden; }
-        .track-text b { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .track-text span { font-size: 11px; color: var(--primary); font-weight: bold; }
+        .track-text b { display: block; font-size: 13px; color: var(--primary); }
+        .track-text span { font-size: 12px; color: #fff; }
 
-        .btn-skip { 
-            background: var(--primary); 
-            color: #000; 
-            border: none; 
-            padding: 15px 30px; 
-            border-radius: 50px; 
-            font-weight: 900; 
-            cursor: pointer; 
-            transition: 0.2s;
-        }
-        .btn-skip:hover { transform: scale(1.05); }
+        .btn-skip { background: var(--primary); color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 900; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -94,26 +33,21 @@
     <div class="player-area">
         <div id="yt-player"></div>
         <div class="now-playing">
-            <img src="logo-osr.png" style="width: 60px;" alt="Logo">
             <div class="info-box">
-                <span id="status-label" class="status-badge">Esperando...</span>
-                <h2 id="display-title" style="margin: 10px 0 5px; font-size: 20px;">The Hub Music OSR</h2>
-                <p id="display-user" style="margin:0; color: var(--text-dim); font-size: 14px;">Inicia el sistema para reproducir</p>
+                <span id="status" style="color:var(--primary); font-size:10px; font-weight:900;">LISTO PARA SONAR</span>
+                <h2 id="display-title" style="margin: 5px 0;">The Hub Music OSR</h2>
+                <p id="display-user" style="margin:0; color:#666;">Esperando primer pedido...</p>
             </div>
-            <button class="btn-skip" onclick="playNext()">SALTAR ⏭️</button>
+            <button class="btn-skip" onclick="playNext()">SIGUIENTE ⏭️</button>
         </div>
     </div>
 
     <div class="sidebar">
-        <div class="sidebar-header">
-            <span>FILA DE REPRODUCCIÓN</span>
-            <button onclick="clearHistory()" style="background:none; border:none; color:#555; cursor:pointer; font-size:10px;">LIMPIAR</button>
-        </div>
+        <div class="sidebar-header">PEDIDOS EN TIEMPO REAL</div>
         <div class="list-scroll">
-            <span class="section-title">Próximos (Sincronizado)</span>
+            <span class="section-title">En Fila (Desde Clientes)</span>
             <div id="queue-container"></div>
-            
-            <span class="section-title">Historial</span>
+            <span class="section-title">Ya sonaron</span>
             <div id="history-container"></div>
         </div>
     </div>
@@ -123,114 +57,64 @@
     <script src="https://www.youtube.com/iframe_api"></script>
 
     <script>
-        // CONFIGURACIÓN (Usa tus mismas credenciales)
         const firebaseConfig = {
             apiKey: "AIzaSyCk4wgJ2LPicyWnO8XXPQxqu49dtqM8jz4",
             databaseURL: "https://the-hub-music-osr-default-rtdb.firebaseio.com",
-            projectId: "the-hub-music-osr",
-            appId: "1:225954155604:web:cb84739b7d7e769661b1c1"
+            projectId: "the-hub-music-osr"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const YT_API_KEY = "AIzaSyBiRDaFPzpNrmg_SHvAZqtBsGXqHXkgK5k";
 
         let player;
-        let currentKey = null;
-        let lastId = "5NV6Rdv1a0w"; // ID por defecto por si la lista está vacía al inicio
+        let lastId = "5NV6Rdv1a0w"; 
 
-        // INICIAR YOUTUBE
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('yt-player', {
-                height: '100%', width: '100%',
-                videoId: lastId,
-                playerVars: { 'autoplay': 1, 'controls': 1, 'rel': 0 },
+                height: '100%', width: '100%', videoId: lastId,
                 events: { 'onStateChange': (e) => { if(e.data === YT.PlayerState.ENDED) playNext(); } }
             });
         }
 
-        // SINCRONIZACIÓN EN TIEMPO REAL CON LA BASE DE DATOS
-        db.ref('osr_lista').on('value', (snapshot) => {
-            const queueDiv = document.getElementById('queue-container');
-            const historyDiv = document.getElementById('history-container');
-            queueDiv.innerHTML = ""; historyDiv.innerHTML = "";
-
-            if (!snapshot.exists()) return;
-
-            snapshot.forEach(child => {
+        // ESCUCHA CONSTANTE DE NUEVOS PEDIDOS
+        db.ref('osr_lista').on('value', (snap) => {
+            const queue = document.getElementById('queue-container');
+            const history = document.getElementById('history-container');
+            queue.innerHTML = ""; history.innerHTML = "";
+            
+            snap.forEach(child => {
                 const data = child.val();
-                const card = document.createElement('div');
-                card.className = 'track-card';
-                card.innerHTML = `
-                    <img src="https://img.youtube.com/vi/${data.id}/mqdefault.jpg">
-                    <div class="track-text">
-                        <b>${data.title}</b>
-                        <span>Pedido por: ${data.user}</span>
-                    </div>
-                `;
-
-                if (data.estado === 'reproducida') {
-                    historyDiv.prepend(card);
-                } else {
-                    queueDiv.appendChild(card);
-                }
+                const card = `
+                    <div class="track-card">
+                        <img src="https://img.youtube.com/vi/${data.id}/mqdefault.jpg">
+                        <div class="track-text"><b>${data.user}</b><span>${data.title}</span></div>
+                    </div>`;
+                if(data.estado === 'reproducida') history.insertAdjacentHTML('afterbegin', card);
+                else queue.insertAdjacentHTML('beforeend', card);
             });
         });
 
-        // FUNCIÓN PARA SALTAR CANCIÓN
         async function playNext() {
-            // Buscamos el primer pedido que no haya sido reproducido
             const snap = await db.ref('osr_lista').orderByChild('estado').equalTo(null).limitToFirst(1).once('value');
-            
-            if (snap.exists()) {
-                // Hay música pedida por compañeros
+            if(snap.exists()) {
                 snap.forEach(child => {
                     const song = child.val();
-                    currentKey = child.key;
-                    startPlayback(song.id, song.title, song.user, false);
-                    // Marcar como reproducida para sincronizar con las apps
-                    db.ref('osr_lista/' + currentKey).update({ estado: 'reproducida' });
+                    lastId = song.id;
+                    player.loadVideoById(song.id);
+                    document.getElementById('display-title').innerText = song.title;
+                    document.getElementById('display-user').innerText = "Pedido por: " + song.user;
+                    db.ref('osr_lista/' + child.key).update({ estado: 'reproducida' });
                 });
-            } else {
-                // NO hay pedidos: Iniciar Modo Radio Automática
-                startRadioMode();
-            }
+            } else { startRadio(); }
         }
 
-        // MODO RADIO (Música similar automáticamente)
-        async function startRadioMode() {
-            document.getElementById('status-label').innerText = "Modo Radio AI";
-            document.getElementById('display-user').innerText = "Generando música similar automáticamente...";
-            
-            try {
-                const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=5&relatedToVideoId=${lastId}&key=${YT_API_KEY}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data.items && data.items.length > 0) {
-                    const next = data.items[Math.floor(Math.random() * data.items.length)];
-                    startPlayback(next.id.videoId, next.snippet.title, "Radio OSR", true);
-                }
-            } catch (e) {
-                console.error("Error Radio:", e);
-                // Si falla la API, repetir última canción para no quedar en silencio
-                player.playVideo();
-            }
-        }
-
-        function startPlayback(id, title, user, isRadio) {
-            lastId = id;
-            player.loadVideoById(id);
-            document.getElementById('display-title').innerText = title;
-            document.getElementById('display-user').innerText = "Pedido por: " + user;
-            document.getElementById('status-label').innerText = isRadio ? "Radio Automática" : "Reproduciendo Pedido";
-            document.getElementById('status-label').style.borderColor = isRadio ? "#bb86fc" : var(--primary);
-            document.getElementById('status-label').style.color = isRadio ? "#bb86fc" : var(--primary);
-        }
-
-        function clearHistory() {
-            if(confirm("¿Borrar todo el historial?")) {
-                db.ref('osr_lista').remove();
-            }
+        async function startRadio() {
+            const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=3&relatedToVideoId=${lastId}&key=${YT_API_KEY}`);
+            const data = await res.json();
+            const next = data.items[Math.floor(Math.random()*data.items.length)];
+            player.loadVideoById(next.id.videoId);
+            document.getElementById('display-title').innerText = next.snippet.title;
+            document.getElementById('display-user').innerText = "Radio Automática (OSR)";
         }
     </script>
 </body>
